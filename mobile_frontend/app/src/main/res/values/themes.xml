@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base app theme -->
+    <style name="Theme.Streamly" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Colors -->
+        <item name="colorPrimary">@color/streamly_primary</item>
+        <item name="colorOnPrimary">@color/streamly_on_primary</item>
+        <item name="android:colorBackground">@color/streamly_black</item>
+        <item name="colorSurface">@color/streamly_surface</item>
+        <item name="colorOnSurface">@color/streamly_on_surface</item>
+
+        <!-- Enforce window background to avoid white flash -->
+        <item name="android:windowBackground">@color/streamly_black</item>
+
+        <!-- Typography: default font family -->
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Figtree.Body</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.Figtree.Body</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Figtree.Title</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Figtree.Label</item>
+        <item name="textAppearanceHeadline1">@style/TextAppearance.Figtree.Headline</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Figtree.Label</item>
+
+        <!-- Status/navigation bars dark background -->
+        <item name="android:statusBarColor">@color/streamly_black</item>
+        <item name="android:navigationBarColor">@color/streamly_black</item>
+    </style>
+
+    <!-- Single splash theme (works on all supported SDKs) -->
+    <style name="Theme.Streamly.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/streamly_black</item>
+        <item name="android:navigationBarColor">@color/streamly_black</item>
+        <!-- Match font to avoid inconsistencies -->
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Figtree.Body</item>
+    </style>
+
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default text appearances pointing to Figtree -->
+    <style name="TextAppearance.Figtree.Body" parent="@android:style/TextAppearance.Material">
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="android:textColor">@color/streamly_on_surface</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Figtree.Title" parent="@android:style/TextAppearance.Material.Large">
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="android:textColor">@color/streamly_on_surface</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Figtree.Headline" parent="@android:style/TextAppearance.Material.Display1">
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="android:textColor">@color/streamly_on_surface</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="TextAppearance.Figtree.Label" parent="@android:style/TextAppearance.Material.Small">
+        <item name="android:fontFamily">@font/figtree</item>
+        <item name="android:textColor">@color/streamly_on_surface</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>

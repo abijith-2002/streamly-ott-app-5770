@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="streamly_black">#090808</color>
+    <color name="streamly_surface">#090808</color>
+    <color name="streamly_on_surface">#FFFFFF</color>
+    <color name="streamly_primary">#FFFFFF</color>
+    <color name="streamly_on_primary">#090808</color>
+    <color name="streamly_secondary">#B0B0B0</color>
+    <color name="streamly_on_secondary">#090808</color>
+</resources>

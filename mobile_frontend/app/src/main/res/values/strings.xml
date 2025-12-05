@@ -23,4 +23,7 @@
 
     <!-- Poster content description -->
     <string name="poster_content_desc">Poster</string>
+
+    <!-- Content Info CTA -->
+    <string name="watch_now">Watch now</string>
 </resources>

@@ -22,6 +22,11 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Streamly" />
+
+        <activity
+            android:name=".ContentInfoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Streamly" />
     </application>
 
 </manifest>

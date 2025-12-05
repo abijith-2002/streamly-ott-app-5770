@@ -1,6 +1,7 @@
 package org.example.app
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -177,11 +178,24 @@ class MainActivity : Activity() {
 
     private fun setupPosterRail(recyclerView: RecyclerView, spacingPx: Int): PosterAdapter {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        val adapter = PosterAdapter(emptyList())
+        val adapter = PosterAdapter(emptyList(), onItemClick = { item ->
+            openContentInfo(item)
+        })
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(HorizontalSpaceItemDecoration(spacingPx))
         recyclerView.setHasFixedSize(true)
         return adapter
+    }
+
+    private fun openContentInfo(item: PosterItem) {
+        val intent = Intent(this, ContentInfoActivity::class.java).apply {
+            putExtra(ContentInfoActivity.EXTRA_ID, item.id)
+            putExtra(ContentInfoActivity.EXTRA_NAME, item.name)
+            putExtra(ContentInfoActivity.EXTRA_POSTER, item.poster)
+        }
+        startActivity(intent)
+        // Use a subtle fade transition
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun fetchAllRails() {

@@ -15,7 +15,8 @@ import coil.load
  * across rails with the same corner radius as the hero banner.
  */
 class PosterAdapter(
-    private var items: List<PosterItem> = emptyList()
+    private var items: List<PosterItem> = emptyList(),
+    private val onItemClick: ((PosterItem) -> Unit)? = null
 ) : RecyclerView.Adapter<PosterAdapter.PosterViewHolder>() {
 
     /** ViewHolder for poster item. */
@@ -40,9 +41,13 @@ class PosterAdapter(
             placeholder(R.drawable.poster_placeholder)
             error(R.drawable.poster_placeholder)
         }
-        // We keep this adapter simple (no title under the image).
-        // If needed later, we can add overlay title support with accessibility contentDescription.
+        // Accessibility: set description to the item's name
         holder.image.contentDescription = item.name
+
+        // Handle clicks: navigate to ContentInfoActivity via host-provided callback
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(item)
+        }
     }
 
     // PUBLIC_INTERFACE

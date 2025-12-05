@@ -216,10 +216,28 @@ class MainActivity : Activity() {
     private fun setNavColors(active: TextView) {
         val activeColor = resources.getColor(R.color.streamly_on_surface)
         val inactiveColor = resources.getColor(R.color.streamly_secondary)
+
+        // Preserve colors
         navSearch.setTextColor(if (active === navSearch) activeColor else inactiveColor)
         navHome.setTextColor(if (active === navHome) activeColor else inactiveColor)
         navMovies.setTextColor(if (active === navMovies) activeColor else inactiveColor)
         navTvShows.setTextColor(if (active === navTvShows) activeColor else inactiveColor)
+
+        // Swap only font family for the focused/active item to figtree_bold.
+        // Others keep existing style from XML/theme.
+        fun setTypefaceBold(view: TextView, isActive: Boolean) {
+            // Typeface.create takes a font-family resource name if available via ResourcesCompat
+            // Here, use Typeface default bold weight by referencing the registered family "figtree" with BOLD style
+            // while leaving size/letter spacing etc. unchanged.
+            view.typeface = if (isActive)
+                android.graphics.Typeface.create("figtree", android.graphics.Typeface.BOLD)
+            else
+                android.graphics.Typeface.create("figtree", android.graphics.Typeface.NORMAL)
+        }
+        setTypefaceBold(navSearch, active === navSearch)
+        setTypefaceBold(navHome, active === navHome)
+        setTypefaceBold(navMovies, active === navMovies)
+        setTypefaceBold(navTvShows, active === navTvShows)
     }
 
     private fun showLoading(show: Boolean) {

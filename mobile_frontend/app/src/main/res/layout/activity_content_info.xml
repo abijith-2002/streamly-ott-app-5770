@@ -47,6 +47,7 @@
                 android:textColor="@color/streamly_on_surface"
                 android:maxLines="2"
                 android:ellipsize="end"
+                android:fontFamily="@font/figtree_bold"
                 android:text="" />
 
             <TextView

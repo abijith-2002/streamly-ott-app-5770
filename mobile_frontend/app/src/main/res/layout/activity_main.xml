@@ -135,7 +135,7 @@
 
                 <TextView
                     android:id="@+id/titleTrending"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -163,7 +163,7 @@
 
                 <TextView
                     android:id="@+id/titleContinueWatching"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -191,7 +191,7 @@
 
                 <TextView
                     android:id="@+id/titleAction"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -219,7 +219,7 @@
 
                 <TextView
                     android:id="@+id/titleDrama"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -247,7 +247,7 @@
 
                 <TextView
                     android:id="@+id/titleHorror"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -275,7 +275,7 @@
 
                 <TextView
                     android:id="@+id/titleFamily"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -304,7 +304,7 @@
 
                 <TextView
                     android:id="@+id/titleComedy"
-                    style="@style/TextAppearance.Figtree.Title"
+                    style="@style/TextAppearance.Figtree.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"

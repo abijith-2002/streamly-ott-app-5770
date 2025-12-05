@@ -13,6 +13,11 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <!-- Bold variant for rail titles: preserve Title sizing/color, swap only font family to bold -->
+    <style name="TextAppearance.Figtree.Title.Bold" parent="@style/TextAppearance.Figtree.Title">
+        <item name="android:fontFamily">@font/figtree_bold</item>
+    </style>
+
     <style name="TextAppearance.Figtree.Headline" parent="@android:style/TextAppearance.Material.Display1">
         <item name="android:fontFamily">@font/figtree</item>
         <item name="android:textColor">@color/streamly_on_surface</item>

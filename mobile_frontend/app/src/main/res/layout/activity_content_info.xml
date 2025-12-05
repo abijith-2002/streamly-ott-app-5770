@@ -11,6 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="420dp">
 
+        <!-- Player view for video playback (hidden until playback starts) -->
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/playerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/detailPosterImage"
             android:layout_width="match_parent"

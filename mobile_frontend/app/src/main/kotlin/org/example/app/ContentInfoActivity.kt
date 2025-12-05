@@ -3,6 +3,7 @@ package org.example.app
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -14,6 +15,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -45,6 +47,7 @@ class ContentInfoActivity : Activity() {
         const val EXTRA_ID = "extra_id"
         const val EXTRA_NAME = "extra_name"
         const val EXTRA_POSTER = "extra_poster"
+        private const val TAG = "ContentInfoActivity"
     }
 
     private val httpClient by lazy { OkHttpClient() }
@@ -55,6 +58,13 @@ class ContentInfoActivity : Activity() {
     private lateinit var descriptionText: TextView
     private lateinit var watchNowButton: Button
     private lateinit var progressBar: ProgressBar
+
+    // Overlay elements to hide when playback starts
+    private lateinit var gradientOverlay: View
+    private lateinit var overlayContent: View
+
+    // Player view for rendering video
+    private lateinit var playerView: StyledPlayerView
 
     // ExoPlayer instance (created on demand)
     private var exoPlayer: ExoPlayer? = null
@@ -72,6 +82,14 @@ class ContentInfoActivity : Activity() {
         descriptionText = findViewById(R.id.infoDescription)
         watchNowButton = findViewById(R.id.watchNowButton)
         progressBar = findViewById(R.id.infoProgress)
+        gradientOverlay = findViewById(R.id.gradientOverlay)
+        overlayContent = findViewById(R.id.overlayContent)
+        playerView = findViewById(R.id.playerView)
+
+        // Configure player view (hidden initially)
+        playerView.visibility = View.GONE
+        playerView.keepScreenOn = true
+        playerView.useController = true
 
         val id = intent.getStringExtra(EXTRA_ID).orEmpty()
         val name = intent.getStringExtra(EXTRA_NAME).orEmpty()
@@ -106,6 +124,7 @@ class ContentInfoActivity : Activity() {
         progressBar.visibility = View.VISIBLE
 
         val url = "$baseUrl/api/info/$id"
+        Log.d(TAG, "Fetching info: $url")
         val request = Request.Builder()
             .url(url)
             .get()
@@ -113,10 +132,10 @@ class ContentInfoActivity : Activity() {
 
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Info fetch failed", e)
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     // Keep existing title from extras; description remains empty
-                    // Show a lightweight toast for feedback; screen is still usable.
                     Toast.makeText(this@ContentInfoActivity, "Failed to load info.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -124,6 +143,7 @@ class ContentInfoActivity : Activity() {
             override fun onResponse(call: Call, response: Response) {
                 val bodyString = response.body?.string().orEmpty()
                 if (!response.isSuccessful || bodyString.isBlank()) {
+                    Log.e(TAG, "Info fetch error: code=${response.code}, bodyEmpty=${bodyString.isBlank()}")
                     runOnUiThread {
                         progressBar.visibility = View.GONE
                         Toast.makeText(this@ContentInfoActivity, "Failed to load info.", Toast.LENGTH_SHORT).show()
@@ -144,7 +164,8 @@ class ContentInfoActivity : Activity() {
                             descriptionText.text = description
                         }
                     }
-                } catch (_: Exception) {
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Info parse error", ex)
                     runOnUiThread {
                         progressBar.visibility = View.GONE
                         Toast.makeText(this@ContentInfoActivity, "Failed to parse info.", Toast.LENGTH_SHORT).show()
@@ -167,6 +188,7 @@ class ContentInfoActivity : Activity() {
         progressBar.visibility = View.VISIBLE
 
         val url = "$baseUrl/api/play"
+        Log.d(TAG, "Requesting playback URL: $url")
         val request = Request.Builder()
             .url(url)
             .get()
@@ -174,16 +196,22 @@ class ContentInfoActivity : Activity() {
 
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Playback API call failed", e)
                 runOnUiThread {
                     watchNowButton.isEnabled = true
                     progressBar.visibility = View.GONE
-                    Toast.makeText(this@ContentInfoActivity, "Unable to start playback. Check your network.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@ContentInfoActivity,
+                        "Unable to start playback. Check your network.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val bodyString = response.body?.string().orEmpty()
                 if (!response.isSuccessful || bodyString.isBlank()) {
+                    Log.e(TAG, "Playback API error: code=${response.code}, bodyEmpty=${bodyString.isBlank()}")
                     runOnUiThread {
                         watchNowButton.isEnabled = true
                         progressBar.visibility = View.GONE
@@ -193,9 +221,10 @@ class ContentInfoActivity : Activity() {
                 }
                 try {
                     val obj = JSONObject(bodyString)
-                    val mediaUrl = obj.optString("url", "")
+                    val mediaUrl = obj.optString("url", "").trim()
 
                     if (mediaUrl.isBlank()) {
+                        Log.e(TAG, "Playback response missing 'url' field: $bodyString")
                         runOnUiThread {
                             watchNowButton.isEnabled = true
                             progressBar.visibility = View.GONE
@@ -204,10 +233,12 @@ class ContentInfoActivity : Activity() {
                         return
                     }
 
+                    Log.d(TAG, "Received playback URL: $mediaUrl")
                     runOnUiThread {
                         startPlayback(mediaUrl)
                     }
-                } catch (_: Exception) {
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Playback response parse error", ex)
                     runOnUiThread {
                         watchNowButton.isEnabled = true
                         progressBar.visibility = View.GONE
@@ -226,21 +257,68 @@ class ContentInfoActivity : Activity() {
      */
     private fun startPlayback(mediaUrl: String) {
         try {
-            // Lazily create player
-            val player = exoPlayer ?: ExoPlayer.Builder(this).build().also {
-                exoPlayer = it
-                // Listen for player errors to surface to the user
-                it.addListener(object : Player.Listener {
+            val parsed = Uri.parse(mediaUrl)
+            if (parsed.scheme.isNullOrBlank()) {
+                Log.e(TAG, "Invalid playback URL (no scheme): $mediaUrl")
+                watchNowButton.isEnabled = true
+                progressBar.visibility = View.GONE
+                Toast.makeText(this, "Invalid playback URL.", Toast.LENGTH_LONG).show()
+                return
+            }
+
+            // Lazily create player with robust error listener
+            val player = exoPlayer ?: ExoPlayer.Builder(this).build().also { created ->
+                exoPlayer = created
+                created.addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
-                        Toast.makeText(this@ContentInfoActivity, "Playback error: ${error.errorCodeName}", Toast.LENGTH_LONG).show()
+                        Log.e(TAG, "ExoPlayer error: ${error.errorCodeName}", error)
+                        Toast.makeText(
+                            this@ContentInfoActivity,
+                            "Playback error: ${error.errorCodeName}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        progressBar.visibility = View.GONE
+                        watchNowButton.isEnabled = true
+                    }
+
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        when (playbackState) {
+                            Player.STATE_BUFFERING -> {
+                                Log.d(TAG, "Player buffering...")
+                                progressBar.visibility = View.VISIBLE
+                            }
+                            Player.STATE_READY -> {
+                                Log.d(TAG, "Player ready.")
+                                progressBar.visibility = View.GONE
+                            }
+                            Player.STATE_ENDED -> {
+                                Log.d(TAG, "Playback ended.")
+                            }
+                            Player.STATE_IDLE -> {
+                                Log.d(TAG, "Player idle.")
+                            }
+                        }
                     }
                 })
             }
 
-            val item = MediaItem.fromUri(Uri.parse(mediaUrl))
-            player.setMediaItem(item)
+            // Attach player to view and show player
+            if (playerView.player !== player) {
+                playerView.player = player
+            }
+            playerView.visibility = View.VISIBLE
+
+            // Hide poster and overlays so video is visible
+            posterImage.visibility = View.GONE
+            gradientOverlay.visibility = View.GONE
+            overlayContent.visibility = View.GONE
+
+            // Prepare media item and start playback
+            val item = MediaItem.fromUri(parsed)
+            player.setMediaItem(item, /* startPositionMs = */ 0)
             player.prepare()
             player.playWhenReady = true
+            player.play() // ensure playback starts immediately
 
             // Keep UI responsive
             watchNowButton.isEnabled = true
@@ -248,24 +326,31 @@ class ContentInfoActivity : Activity() {
 
             // Informative toast (non-intrusive)
             Toast.makeText(this, "Starting playback…", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "Playback started for URL: $mediaUrl")
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to start playback", e)
             watchNowButton.isEnabled = true
             progressBar.visibility = View.GONE
             Toast.makeText(this, "Failed to start playback.", Toast.LENGTH_LONG).show()
         }
     }
 
+    // PUBLIC_INTERFACE
     override fun onStop() {
+        /** Pause playback when leaving screen; keep player to allow resume in onStart if needed. */
         super.onStop()
-        // Pause playback when leaving screen; keep player to allow resume in onStart if needed
         exoPlayer?.playWhenReady = false
         exoPlayer?.pause()
+        Log.d(TAG, "onStop: player paused")
     }
 
+    // PUBLIC_INTERFACE
     override fun onDestroy() {
+        /** Release player resources when Activity is destroyed. */
         super.onDestroy()
-        // Release player resources when Activity is destroyed
         exoPlayer?.release()
         exoPlayer = null
+        playerView.player = null
+        Log.d(TAG, "onDestroy: player released")
     }
 }

@@ -81,6 +81,7 @@ dependencies {
 
     // ExoPlayer for media playback
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
 
     // Unit testing (JUnit4 aligns with provided tests)
     testImplementation("junit:junit:4.13.2")

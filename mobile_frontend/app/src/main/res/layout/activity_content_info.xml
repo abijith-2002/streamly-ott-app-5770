@@ -76,6 +76,7 @@
                 android:paddingBottom="10dp"
                 android:textStyle="bold"
                 android:drawableStart="@drawable/play"
+                android:drawableLeft="@drawable/play"
                 android:drawablePadding="8dp" />
         </LinearLayout>
 

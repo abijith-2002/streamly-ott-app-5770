@@ -1,13 +1,6 @@
 androidApplication {
     namespace = "org.example.app"
 
-    // Ensure unit test task does not fail when no tests are discovered
-    testing {
-        unitTests {
-            failOnNoDiscoveredTests = false
-        }
-    }
-
     dependencies {
         implementation("org.apache.commons:commons-text:1.11.0")
         implementation(project(":utilities"))

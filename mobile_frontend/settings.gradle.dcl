@@ -29,6 +29,7 @@ defaults {
             dependencies {
                 implementation("org.junit.jupiter:junit-jupiter:5.10.2")
                 runtimeOnly("org.junit.platform:junit-platform-launcher")
+                implementation("junit:junit:4.13.2")
             }
         }
     }

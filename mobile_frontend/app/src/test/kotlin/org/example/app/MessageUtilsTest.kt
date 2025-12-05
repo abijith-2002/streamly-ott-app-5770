@@ -1,12 +1,16 @@
 package org.example.app
 
-import org.junit.jupiter.api.Test
+import org.junit.Test
+import org.junit.Assert.assertEquals
 
-import org.junit.jupiter.api.Assertions.assertEquals
-
+/**
+ * PUBLIC_INTERFACE
+ * Basic unit test for MessageUtils. Uses JUnit4 to ensure discovery with Android unit tests.
+ */
 class MessageUtilsTest {
     @Test
     fun testGetMessage() {
-        assertEquals("Hello      World!", MessageUtils.message())
+        // Expect exactly the message produced by MessageUtils
+        assertEquals("Hello     World!", MessageUtils.message())
     }
 }

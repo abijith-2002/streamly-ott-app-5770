@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="banner_card_height">200dp</dimen>
+    <!-- Maintain ~705x397 aspect ratio (~1.776) for width -->
+    <dimen name="banner_card_width">356dp</dimen>
+    <dimen name="banner_card_corner_radius">12dp</dimen>
+</resources>

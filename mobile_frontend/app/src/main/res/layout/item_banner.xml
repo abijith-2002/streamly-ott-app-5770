@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bannerCard"
+    android:layout_width="@dimen/banner_card_width"
+    android:layout_height="@dimen/banner_card_height"
+    android:layout_marginTop="0dp"
+    android:layout_marginBottom="0dp"
+    app:cardUseCompatPadding="false"
+    app:cardCornerRadius="@dimen/banner_card_corner_radius"
+    app:cardPreventCornerOverlap="true"
+    app:strokeColor="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/bannerImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/banner_content_desc"
+        android:src="@drawable/banner_placeholder" />
+
+</com.google.android.material.card.MaterialCardView>

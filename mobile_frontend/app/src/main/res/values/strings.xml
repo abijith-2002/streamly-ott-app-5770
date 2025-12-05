@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Sample Declarative Gradle Android App</string>
+
+    <!-- Top navigation labels -->
+    <string name="nav_search">Search</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_tv_shows">TV Shows</string>
+
+    <!-- Banner / error UI strings -->
+    <string name="error_banner_load">Unable to load banners.</string>
+    <string name="retry">Retry</string>
+    <string name="banner_content_desc">Promotional banner</string>
 </resources>

@@ -1,17 +1,113 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/streamly_black"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView"
-        style="@style/TextAppearance.Figtree.Title"
-        android:layout_width="wrap_content"
+    <!-- Top Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/navSearch"
+            style="@style/TextAppearance.Figtree.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/nav_search"
+            android:textColor="@color/streamly_secondary" />
+
+        <TextView
+            android:id="@+id/navHome"
+            style="@style/TextAppearance.Figtree.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/nav_home"
+            android:textColor="@color/streamly_on_surface" />
+
+        <TextView
+            android:id="@+id/navMovies"
+            style="@style/TextAppearance.Figtree.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/nav_movies"
+            android:textColor="@color/streamly_secondary" />
+
+        <TextView
+            android:id="@+id/navTvShows"
+            style="@style/TextAppearance.Figtree.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/nav_tv_shows"
+            android:textColor="@color/streamly_secondary" />
+    </LinearLayout>
+
+    <!-- Progress indicator while loading banners -->
+    <ProgressBar
+        android:id="@+id/bannerProgress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <!-- Error container for graceful failure with retry -->
+    <LinearLayout
+        android:id="@+id/errorContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/streamly_on_surface"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
-</RelativeLayout>
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/errorText"
+            style="@style/TextAppearance.Figtree.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/error_banner_load"
+            android:textColor="@color/streamly_on_surface" />
+
+        <Button
+            android:id="@+id/retryButton"
+            style="@style/TextAppearance.Figtree.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retry" />
+    </LinearLayout>
+
+    <!-- Hero banner carousel directly under the nav bar -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bannerRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/banner_card_height"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:clipChildren="false" />
+
+</LinearLayout>

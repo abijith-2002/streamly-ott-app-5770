@@ -10,5 +10,14 @@ androidApplication {
         implementation("androidx.appcompat:appcompat:1.7.0")
         // Core KTX (optional helpers)
         implementation("androidx.core:core-ktx:1.13.1")
+
+        // RecyclerView for horizontal carousel
+        implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+        // Coil for image loading
+        implementation("io.coil-kt:coil:2.6.0")
+
+        // OkHttp for network requests
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
     }
 }

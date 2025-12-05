@@ -59,55 +59,261 @@
             android:textColor="@color/streamly_secondary" />
     </LinearLayout>
 
-    <!-- Progress indicator while loading banners -->
-    <ProgressBar
-        android:id="@+id/bannerProgress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center_horizontal"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <!-- Error container for graceful failure with retry -->
-    <LinearLayout
-        android:id="@+id/errorContainer"
+    <!-- Scrollable content area -->
+    <ScrollView
+        android:id="@+id/contentScroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:gravity="center_vertical"
-        android:visibility="gone">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never">
 
-        <TextView
-            android:id="@+id/errorText"
-            style="@style/TextAppearance.Figtree.Body"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/error_banner_load"
-            android:textColor="@color/streamly_on_surface" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/retryButton"
-            style="@style/TextAppearance.Figtree.Label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/retry" />
-    </LinearLayout>
+            <!-- Progress indicator while loading banners -->
+            <ProgressBar
+                android:id="@+id/bannerProgress"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center_horizontal"
+                android:indeterminate="true"
+                android:visibility="gone" />
 
-    <!-- Hero banner carousel directly under the nav bar -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bannerRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/banner_card_height"
-        android:layout_marginTop="8dp"
-        android:overScrollMode="never"
-        android:clipToPadding="false"
-        android:clipChildren="false" />
+            <!-- Error container for graceful failure with retry -->
+            <LinearLayout
+                android:id="@+id/errorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
 
+                <TextView
+                    android:id="@+id/errorText"
+                    style="@style/TextAppearance.Figtree.Body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/error_banner_load"
+                    android:textColor="@color/streamly_on_surface" />
+
+                <Button
+                    android:id="@+id/retryButton"
+                    style="@style/TextAppearance.Figtree.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/retry" />
+            </LinearLayout>
+
+            <!-- Hero banner carousel directly under the nav bar -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bannerRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/banner_card_height"
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                android:clipToPadding="false"
+                android:clipChildren="false" />
+
+            <!-- Trending Rail -->
+            <LinearLayout
+                android:id="@+id/containerTrending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleTrending"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_trending" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerTrending"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Continue Watching Rail -->
+            <LinearLayout
+                android:id="@+id/containerContinueWatching"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleContinueWatching"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_continue_watching" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerContinueWatching"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Action Rail -->
+            <LinearLayout
+                android:id="@+id/containerAction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleAction"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_action" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerAction"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Drama Rail -->
+            <LinearLayout
+                android:id="@+id/containerDrama"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleDrama"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_drama" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerDrama"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Horror Rail -->
+            <LinearLayout
+                android:id="@+id/containerHorror"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleHorror"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_horror" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerHorror"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Family Rail -->
+            <LinearLayout
+                android:id="@+id/containerFamily"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/titleFamily"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_family" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerFamily"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+            <!-- Comedy Rail -->
+            <LinearLayout
+                android:id="@+id/containerComedy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/titleComedy"
+                    style="@style/TextAppearance.Figtree.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/rail_comedy" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerComedy"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/poster_card_height"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

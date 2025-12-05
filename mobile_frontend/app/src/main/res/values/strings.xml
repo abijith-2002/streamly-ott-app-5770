@@ -11,4 +11,16 @@
     <string name="error_banner_load">Unable to load banners.</string>
     <string name="retry">Retry</string>
     <string name="banner_content_desc">Promotional banner</string>
+
+    <!-- Rail labels -->
+    <string name="rail_trending">Trending</string>
+    <string name="rail_continue_watching">Continue Watching</string>
+    <string name="rail_action">Action</string>
+    <string name="rail_drama">Drama</string>
+    <string name="rail_horror">Horror</string>
+    <string name="rail_family">Family</string>
+    <string name="rail_comedy">Comedy</string>
+
+    <!-- Poster content description -->
+    <string name="poster_content_desc">Poster</string>
 </resources>

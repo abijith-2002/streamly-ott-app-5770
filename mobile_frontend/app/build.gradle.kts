@@ -79,6 +79,9 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // ExoPlayer for media playback
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+
     // Unit testing (JUnit4 aligns with provided tests)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

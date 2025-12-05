@@ -1,6 +1,7 @@
 package org.example.app
 
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -9,6 +10,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import coil.load
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -32,6 +37,7 @@ import java.io.IOException
  * - Fetches GET https://4b746313.api.kavia.app/api/info/{id} to load {title, description}.
  * - Renders title/description over the gradient with Figtree font.
  * - Provides a pill-shaped "Watch now" button (#C60A0A).
+ * - On "Watch now": GET /api/play, parse {"url": "<mediaUrl>"}, and start playback with ExoPlayer.
  */
 class ContentInfoActivity : Activity() {
 
@@ -49,6 +55,9 @@ class ContentInfoActivity : Activity() {
     private lateinit var descriptionText: TextView
     private lateinit var watchNowButton: Button
     private lateinit var progressBar: ProgressBar
+
+    // ExoPlayer instance (created on demand)
+    private var exoPlayer: ExoPlayer? = null
 
     // PUBLIC_INTERFACE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,9 +88,9 @@ class ContentInfoActivity : Activity() {
         titleText.text = name
         descriptionText.text = "" // Will be populated after network call
 
-        // Hook up watch button (placeholder)
+        // Attach click handler to "Watch now"
         watchNowButton.setOnClickListener {
-            Toast.makeText(this, getString(R.string.watch_now), Toast.LENGTH_SHORT).show()
+            onWatchNowClicked()
         }
 
         if (id.isNotBlank()) {
@@ -89,6 +98,10 @@ class ContentInfoActivity : Activity() {
         }
     }
 
+    /**
+     * PUBLIC_INTERFACE
+     * Fetches the content details to populate UI.
+     */
     private fun fetchInfo(id: String) {
         progressBar.visibility = View.VISIBLE
 
@@ -139,5 +152,120 @@ class ContentInfoActivity : Activity() {
                 }
             }
         })
+    }
+
+    /**
+     * PUBLIC_INTERFACE
+     * Handles the "Watch now" action: calls /api/play, parses the media URL, and starts playback.
+     */
+    private fun onWatchNowClicked() {
+        // Provide immediate UI feedback
+        Toast.makeText(this, getString(R.string.watch_now), Toast.LENGTH_SHORT).show()
+
+        // Disable the button briefly and show progress
+        watchNowButton.isEnabled = false
+        progressBar.visibility = View.VISIBLE
+
+        val url = "$baseUrl/api/play"
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    watchNowButton.isEnabled = true
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this@ContentInfoActivity, "Unable to start playback. Check your network.", Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyString = response.body?.string().orEmpty()
+                if (!response.isSuccessful || bodyString.isBlank()) {
+                    runOnUiThread {
+                        watchNowButton.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        Toast.makeText(this@ContentInfoActivity, "Playback API error.", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                try {
+                    val obj = JSONObject(bodyString)
+                    val mediaUrl = obj.optString("url", "")
+
+                    if (mediaUrl.isBlank()) {
+                        runOnUiThread {
+                            watchNowButton.isEnabled = true
+                            progressBar.visibility = View.GONE
+                            Toast.makeText(this@ContentInfoActivity, "Missing playback URL.", Toast.LENGTH_LONG).show()
+                        }
+                        return
+                    }
+
+                    runOnUiThread {
+                        startPlayback(mediaUrl)
+                    }
+                } catch (_: Exception) {
+                    runOnUiThread {
+                        watchNowButton.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        Toast.makeText(this@ContentInfoActivity, "Invalid playback response.", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * PUBLIC_INTERFACE
+     * Initializes ExoPlayer if needed, sets the media item, prepares, and starts playback.
+     *
+     * @param mediaUrl The URL string to play.
+     */
+    private fun startPlayback(mediaUrl: String) {
+        try {
+            // Lazily create player
+            val player = exoPlayer ?: ExoPlayer.Builder(this).build().also {
+                exoPlayer = it
+                // Listen for player errors to surface to the user
+                it.addListener(object : Player.Listener {
+                    override fun onPlayerError(error: PlaybackException) {
+                        Toast.makeText(this@ContentInfoActivity, "Playback error: ${error.errorCodeName}", Toast.LENGTH_LONG).show()
+                    }
+                })
+            }
+
+            val item = MediaItem.fromUri(Uri.parse(mediaUrl))
+            player.setMediaItem(item)
+            player.prepare()
+            player.playWhenReady = true
+
+            // Keep UI responsive
+            watchNowButton.isEnabled = true
+            progressBar.visibility = View.GONE
+
+            // Informative toast (non-intrusive)
+            Toast.makeText(this, "Starting playback…", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            watchNowButton.isEnabled = true
+            progressBar.visibility = View.GONE
+            Toast.makeText(this, "Failed to start playback.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Pause playback when leaving screen; keep player to allow resume in onStart if needed
+        exoPlayer?.playWhenReady = false
+        exoPlayer?.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Release player resources when Activity is destroyed
+        exoPlayer?.release()
+        exoPlayer = null
     }
 }

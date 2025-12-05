@@ -140,6 +140,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_trending" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -167,6 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_continue_watching" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -194,6 +196,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_action" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -221,6 +224,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_drama" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -248,6 +252,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_horror" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -275,6 +280,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_family" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -303,6 +309,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="@dimen/rail_title_bottom_margin"
                     android:text="@string/rail_comedy" />
 
                 <androidx.recyclerview.widget.RecyclerView

@@ -2,6 +2,9 @@
 <resources>
     <dimen name="space_16">16dp</dimen>
 
+    <!-- Space between a rail's title and its poster list -->
+    <dimen name="rail_title_bottom_margin">12dp</dimen>
+
     <!-- Banner card sizing (approx 705x397 aspect ratio) -->
     <dimen name="banner_card_height">200dp</dimen>
     <!-- Maintain ~705x397 aspect ratio (~1.776) for width -->

@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -64,6 +66,13 @@ class PlayerActivity : Activity() {
     private var title: String = ""
     private var poster: String = ""
 
+    // Unified controller animation group (applies to progress, times, play/pause, settings together)
+    private var controllerGroup: View? = null
+    private val showInterpolator = DecelerateInterpolator() // Material-like ease-out for showing
+    private val hideInterpolator = AccelerateInterpolator() // Ease-in for hiding
+    private val controllerAnimDurationMs = 220L
+    private val controllerTranslateYPx by lazy { dpToPx(16f) } // subtle slide from bottom
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Dark background to avoid white flashes
@@ -89,6 +98,7 @@ class PlayerActivity : Activity() {
 
         // Keep screen on while this activity is active
         playerView.keepScreenOn = true
+        // Apply a single global timeout for the entire group (no per-view timers)
         playerView.controllerShowTimeoutMs = 5000
         playerView.useController = true
 
@@ -104,6 +114,9 @@ class PlayerActivity : Activity() {
         } else {
             posterView?.visibility = View.GONE
         }
+
+        // Hook controller group + animations before user interaction
+        setupUnifiedControllerAnimations()
 
         // Wire custom controls: settings and fullscreen close/back
         wireControllerButtons()
@@ -130,6 +143,89 @@ class PlayerActivity : Activity() {
         // Use fullscreen button as a back/exit in dedicated player activity
         fullscreenButton?.setOnClickListener {
             onBackPressed()
+        }
+    }
+
+    /**
+     * Sets up a single controller visibility coordinator that animates the entire controls group
+     * (play/pause, timebar, times, and settings) with the same easing and duration.
+     *
+     * Uses StyledPlayerView.setControllerVisibilityListener to sync with the controller lifecycle
+     * and ensures the auto-hide timeout applies to the whole group simultaneously.
+     */
+    private fun setupUnifiedControllerAnimations() {
+        // Find our unified group; fallback to root controller if custom group not found
+        controllerGroup = playerView.findViewById(R.id.controllerGroup)
+            ?: playerView.findViewById(R.id.exo_controller)
+
+        // Initialize group to visible without flicker; StyledPlayerView will trigger hide later via timeout
+        controllerGroup?.apply {
+            alpha = 1f
+            translationY = 0f
+            visibility = View.VISIBLE
+        }
+
+        // Animate when the controller visibility changes
+        playerView.setControllerVisibilityListener(
+            object : com.google.android.exoplayer2.ui.StyledPlayerControlView.VisibilityListener {
+                override fun onVisibilityChange(visibility: Int) {
+                    if (visibility == View.VISIBLE) {
+                        animateControllerGroup(show = true)
+                    } else {
+                        animateControllerGroup(show = false)
+                    }
+                }
+            }
+        )
+
+        // Also ensure initial state after inflation (in case listener hasn't fired yet)
+        playerView.post {
+            // Default show state on start; Exo will auto-hide after timeout
+            animateControllerGroup(show = true, immediate = true)
+        }
+    }
+
+    /**
+     * Animate the unified controls group using consistent easing and durations.
+     * All controller elements move/fade together to maintain a single lifecycle.
+     */
+    private fun animateControllerGroup(show: Boolean, immediate: Boolean = false) {
+        val group = controllerGroup ?: return
+        group.animate().cancel()
+
+        if (show) {
+            group.visibility = View.VISIBLE
+            if (immediate) {
+                group.alpha = 1f
+                group.translationY = 0f
+                return
+            }
+            // Start from slightly translated/transparent to ease-in
+            if (group.alpha < 1f) {
+                group.alpha = 0f
+                group.translationY = controllerTranslateYPx
+            }
+            group.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(controllerAnimDurationMs)
+                .setInterpolator(showInterpolator)
+                .withEndAction { group.visibility = View.VISIBLE }
+                .start()
+        } else {
+            if (immediate) {
+                group.alpha = 0f
+                group.translationY = controllerTranslateYPx
+                group.visibility = View.GONE
+                return
+            }
+            group.animate()
+                .alpha(0f)
+                .translationY(controllerTranslateYPx)
+                .setDuration(controllerAnimDurationMs)
+                .setInterpolator(hideInterpolator)
+                .withEndAction { group.visibility = View.GONE }
+                .start()
         }
     }
 
@@ -262,5 +358,9 @@ class PlayerActivity : Activity() {
         releasePlayer()
         super.onBackPressed()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    private fun dpToPx(dp: Float): Float {
+        return dp * resources.displayMetrics.density
     }
 }

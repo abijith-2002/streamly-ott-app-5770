@@ -49,12 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00:00"
-                    android:textColor="@color/streamly_on_surface"
-                    android:minEms="7"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:includeFontPadding="false"
-                    android:fontFeatureSettings="tnum" />
+                    android:textColor="@color/streamly_on_surface" />
 
                 <!-- Progress container with rounded clipping (responsive width) -->
                 <FrameLayout
@@ -87,12 +82,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00:00"
-                    android:textColor="@color/streamly_on_surface"
-                    android:minEms="7"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:includeFontPadding="false"
-                    android:fontFeatureSettings="tnum" />
+                    android:textColor="@color/streamly_on_surface" />
             </LinearLayout>
 
             <!-- Row 2: Action buttons aligned to the right (Settings then Fullscreen) -->

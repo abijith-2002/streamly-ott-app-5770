@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/exo_controller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="0dp">
+
+    <!-- Central play/pause control; StyledPlayerControlView will set icon state -->
+    <ImageButton
+        android:id="@+id/exo_play_pause"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/watch_now"
+        app:tint="@color/streamly_on_surface" />
+
+    <!-- Bottom controls area -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
+
+        <!-- Progress bar -->
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@+id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Current position: start-aligned to progress bar start -->
+        <TextView
+            android:id="@+id/exo_position"
+            style="@style/TextAppearance.Figtree.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textColor="@color/streamly_on_surface"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/exo_progress"
+            app:layout_constraintStart_toStartOf="@id/exo_progress" />
+
+        <!-- Total duration: end-aligned to progress bar end -->
+        <TextView
+            android:id="@+id/exo_duration"
+            style="@style/TextAppearance.Figtree.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textColor="@color/streamly_on_surface"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/exo_progress"
+            app:layout_constraintEnd_toEndOf="@id/exo_progress" />
+
+        <!-- Settings icon: immediately to the left of total duration -->
+        <ImageButton
+            android:id="@+id/exo_settings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_manage"
+            app:tint="@color/streamly_on_surface"
+            android:contentDescription="@string/player_settings"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toTopOf="@id/exo_duration"
+            app:layout_constraintBottom_toBottomOf="@id/exo_duration"
+            app:layout_constraintEnd_toStartOf="@id/exo_duration" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

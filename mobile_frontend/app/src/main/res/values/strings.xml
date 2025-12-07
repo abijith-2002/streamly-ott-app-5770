@@ -26,4 +26,7 @@
 
     <!-- Content Info CTA -->
     <string name="watch_now">Watch now</string>
+
+    <!-- Player accessibility -->
+    <string name="player_settings">Playback settings</string>
 </resources>

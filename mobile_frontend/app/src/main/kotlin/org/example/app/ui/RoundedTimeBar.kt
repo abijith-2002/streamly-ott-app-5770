@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
@@ -27,7 +28,8 @@ import kotlin.math.min
  * - Use this view in controller layout with id @id/exo_progress so StyledPlayerControlView
  *   binds to it automatically.
  * - It respects app:bar_height and app:touch_target_height attributes.
- * - The scrubber is drawn by the parent (DefaultTimeBar); the track is drawn here.
+ * - The default scrubber is suppressed and a custom thumb is drawn inside the bar such that
+ *   its center aligns exactly with the end of the played segment.
  */
 class RoundedTimeBar @JvmOverloads constructor(
     context: Context,
@@ -55,6 +57,11 @@ class RoundedTimeBar @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = unplayedColor
     }
+    // Custom thumb paint (same color as played to appear connected)
+    private val thumbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = playedColor
+    }
 
     private var durationMs: Long = 0L
     private var positionMs: Long = 0L
@@ -71,6 +78,9 @@ class RoundedTimeBar @JvmOverloads constructor(
         setPlayedColor(Color.TRANSPARENT)
         setBufferedColor(Color.TRANSPARENT)
         setUnplayedColor(Color.TRANSPARENT)
+
+        // Suppress DefaultTimeBar's scrubber: we will draw our own
+        setScrubberColor(Color.TRANSPARENT)
 
         // Keep our bar in sync while scrubbing (before the control view pushes setPosition updates)
         addListener(object : TimeBar.OnScrubListener {
@@ -130,13 +140,18 @@ class RoundedTimeBar @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        // Draw custom rounded track first
-        drawRoundedTrack(canvas)
-        // Let DefaultTimeBar draw scrubber, ad markers, etc. (track colors are transparent)
+        // Draw custom rounded track with custom thumb
+        drawRoundedTrackAndThumb(canvas)
+        // Let DefaultTimeBar draw ad markers, etc. (track/scrubber are transparent)
         super.onDraw(canvas)
     }
 
-    private fun drawRoundedTrack(canvas: Canvas) {
+    /**
+     * Draws the full rounded track (unplayed, buffered, played) and a custom thumb.
+     * The thumb's center is exactly at the end of the played segment and it is clipped
+     * to the rounded track bounds so it never floats outside.
+     */
+    private fun drawRoundedTrackAndThumb(canvas: Canvas) {
         val pl = paddingLeft.toFloat()
         val pr = paddingRight.toFloat()
         val pt = paddingTop.toFloat()
@@ -153,30 +168,49 @@ class RoundedTimeBar @JvmOverloads constructor(
         val bottom = centerY + barHeight / 2f
         val left = pl
         val right = pl + totalW
-        val radius = min(cornerRadiusDefaultPx, barHeight / 2f)
+        val trackRadius = min(cornerRadiusDefaultPx, barHeight / 2f)
 
         // Base: unplayed full track
         rect.set(left, top, right, bottom)
-        canvas.drawRoundRect(rect, radius, radius, unplayedPaint)
+        canvas.drawRoundRect(rect, trackRadius, trackRadius, unplayedPaint)
 
         if (durationMs <= 0L) {
             // No duration known yet; nothing more to draw
             return
         }
 
-        // Buffered segment
         val bufferedFrac = bufferedPositionMs.toSafeFrac(durationMs)
+        val playedFrac = positionMs.toSafeFrac(durationMs)
+
+        // Clip content to rounded track so thumb never draws outside of pill bounds
+        val clipPath = Path().apply {
+            addRoundRect(rect, trackRadius, trackRadius, Path.Direction.CW)
+        }
+        canvas.save()
+        canvas.clipPath(clipPath)
+
+        // Buffered segment
         if (bufferedFrac > 0f) {
-            rect.set(left, top, left + totalW * bufferedFrac, bottom)
-            canvas.drawRoundRect(rect, radius, radius, bufferedPaint)
+            val bufferedRight = left + totalW * bufferedFrac
+            rect.set(left, top, bufferedRight.coerceIn(left, right), bottom)
+            canvas.drawRoundRect(rect, trackRadius, trackRadius, bufferedPaint)
         }
 
         // Played segment
-        val playedFrac = positionMs.toSafeFrac(durationMs)
         if (playedFrac > 0f) {
-            rect.set(left, top, left + totalW * playedFrac, bottom)
-            canvas.drawRoundRect(rect, radius, radius, playedPaint)
+            val playedRight = left + totalW * playedFrac
+            rect.set(left, top, playedRight.coerceIn(left, right), bottom)
+            canvas.drawRoundRect(rect, trackRadius, trackRadius, playedPaint)
         }
+
+        // Custom thumb: center exactly at the end of the played portion and fully within the track via clipping
+        val thumbCenterX = (left + totalW * playedFrac).coerceIn(left, right)
+        val thumbCenterY = centerY
+        // Thumb radius fits within the track height so it's visually inside the bar
+        val thumbRadius = min(barHeight / 2f, trackRadius)
+        canvas.drawCircle(thumbCenterX, thumbCenterY, thumbRadius, thumbPaint)
+
+        canvas.restore()
     }
 
     private fun withAlpha(color: Int, alpha: Int): Int {

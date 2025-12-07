@@ -17,7 +17,7 @@
 
     <!-- Player / controls -->
     <dimen name="player_header_height">420dp</dimen>
-    <dimen name="timebar_corner_radius">10dp</dimen>
+    <dimen name="timebar_corner_radius">4dp</dimen>
     <dimen name="timebar_height">8dp</dimen>
     <dimen name="timebar_touch_target">32dp</dimen>
     <dimen name="action_button_size">48dp</dimen>

@@ -29,6 +29,13 @@
             android:name=".ContentInfoActivity"
             android:exported="false"
             android:theme="@style/Theme.Streamly" />
+
+        <!-- Dedicated full-screen player activity -->
+        <activity
+            android:name=".PlayerActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.Streamly" />
     </application>
 
 </manifest>

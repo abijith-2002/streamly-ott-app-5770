@@ -1,26 +1,17 @@
 package org.example.app
 
 import android.app.Activity
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowInsets
 import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import coil.load
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -39,12 +30,11 @@ import java.io.IOException
  * - EXTRA_POSTER (String): The poster image URL to show at the top.
  *
  * Behavior:
- * - Shows the poster image full-width at the top.
- * - Overlays a bottom gradient that blends into #090808 for readability.
+ * - Shows the poster image full-width at the top with gradient overlay for readability.
  * - Fetches GET https://4b746313.api.kavia.app/api/info/{id} to load {title, description}.
  * - Renders title/description over the gradient with Figtree font.
  * - Provides a pill-shaped "Watch now" button (#C60A0A).
- * - On "Watch now": GET /api/play, parse {"url": "<mediaUrl>"}, and start playback with ExoPlayer.
+ * - On "Watch now": GET /api/play, parse {"url": "<mediaUrl>"}, and open PlayerActivity for playback.
  */
 class ContentInfoActivity : Activity() {
 
@@ -64,21 +54,16 @@ class ContentInfoActivity : Activity() {
     private lateinit var watchNowButton: Button
     private lateinit var progressBar: ProgressBar
 
-    // Overlay elements to hide when playback starts
+    // Overlay elements (kept; no inline player)
     private lateinit var gradientOverlay: View
     private lateinit var overlayContent: View
 
-    // Player view for rendering video
-    private lateinit var playerView: StyledPlayerView
-
-    // Container and scroll for fullscreen toggle management
-    private lateinit var headerContainer: FrameLayout
+    // Container and scroll (kept for layout)
     private lateinit var extraContentScroll: ScrollView
-    private var defaultHeaderHeightPx: Int = 0
-    private var isFullscreen: Boolean = false
 
-    // ExoPlayer instance (created on demand)
-    private var exoPlayer: ExoPlayer? = null
+    // Extras
+    private var posterUrl: String = ""
+    private var displayName: String = ""
 
     // PUBLIC_INTERFACE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,34 +80,21 @@ class ContentInfoActivity : Activity() {
         progressBar = findViewById(R.id.infoProgress)
         gradientOverlay = findViewById(R.id.gradientOverlay)
         overlayContent = findViewById(R.id.overlayContent)
-        playerView = findViewById(R.id.playerView)
-        headerContainer = findViewById(R.id.headerContainer)
         extraContentScroll = findViewById(R.id.extraContentScroll)
-        defaultHeaderHeightPx = resources.getDimensionPixelSize(R.dimen.player_header_height)
-
-        // Configure player view (hidden initially)
-        playerView.visibility = View.GONE
-        playerView.keepScreenOn = true
-        playerView.useController = true
-        // Keep controls visible longer so actions (e.g., fullscreen) are reliably tappable
-        playerView.controllerShowTimeoutMs = 5000
-
-        // Wire player controller buttons (settings / fullscreen)
-        wirePlayerControls()
 
         val id = intent.getStringExtra(EXTRA_ID).orEmpty()
-        val name = intent.getStringExtra(EXTRA_NAME).orEmpty()
-        val poster = intent.getStringExtra(EXTRA_POSTER).orEmpty()
+        displayName = intent.getStringExtra(EXTRA_NAME).orEmpty()
+        posterUrl = intent.getStringExtra(EXTRA_POSTER).orEmpty()
 
         // Load poster immediately
-        posterImage.load(poster) {
+        posterImage.load(posterUrl) {
             crossfade(true)
             placeholder(R.drawable.poster_placeholder)
             error(R.drawable.poster_placeholder)
         }
 
         // Set initial title from rail (replaced by server title if available)
-        titleText.text = name
+        titleText.text = displayName
         descriptionText.text = "" // Will be populated after network call
 
         // Attach click handler to "Watch now"
@@ -133,72 +105,6 @@ class ContentInfoActivity : Activity() {
         if (id.isNotBlank()) {
             fetchInfo(id)
         }
-    }
-
-    /**
-     * PUBLIC_INTERFACE
-     * Wires the controller's settings and fullscreen buttons.
-     */
-    private fun wirePlayerControls() {
-        // Try immediate lookup
-        attachControllerListenersIfPresent()
-        // Also post a second attempt in case controller inflates later
-        playerView.post {
-            attachControllerListenersIfPresent()
-        }
-    }
-
-    private fun attachControllerListenersIfPresent() {
-        val fullscreenButton = playerView.findViewById<ImageButton?>(R.id.exo_fullscreen)
-        val settingsButton = playerView.findViewById<ImageButton?>(R.id.exo_settings)
-        fullscreenButton?.setOnClickListener { toggleFullscreen() }
-        settingsButton?.setOnClickListener { onSettingsClicked() }
-    }
-
-    /**
-     * PUBLIC_INTERFACE
-     * Toggles fullscreen playback by hiding system UI and resizing the player container.
-     *
-     * Behavior:
-     * - Enter: hide status/navigation bars, expand headerContainer to match_parent, hide extra content.
-     * - Exit: show system bars, restore header height from dimens, show extra content.
-     */
-    private fun toggleFullscreen() {
-        isFullscreen = !isFullscreen
-        if (isFullscreen) {
-            // Hide system UI for immersive fullscreen
-            window.insetsController?.let { controller ->
-                controller.hide(WindowInsets.Type.systemBars())
-                controller.systemBarsBehavior =
-                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-
-            // Expand player to full height and hide scroll content
-            headerContainer.layoutParams = headerContainer.layoutParams.apply {
-                height = ViewGroup.LayoutParams.MATCH_PARENT
-            }
-            headerContainer.requestLayout()
-            extraContentScroll.visibility = View.GONE
-        } else {
-            // Show system UI
-            window.insetsController?.show(WindowInsets.Type.systemBars())
-
-            // Restore player height and show scroll content
-            headerContainer.layoutParams = headerContainer.layoutParams.apply {
-                height = defaultHeaderHeightPx
-            }
-            headerContainer.requestLayout()
-            extraContentScroll.visibility = View.VISIBLE
-        }
-    }
-
-    /**
-     * PUBLIC_INTERFACE
-     * Stub settings handler; replace with real settings screen or dialog when available.
-     */
-    private fun onSettingsClicked() {
-        Toast.makeText(this, getString(R.string.player_settings), Toast.LENGTH_SHORT).show()
-        Log.d(TAG, "Settings clicked (stub).")
     }
 
     /**
@@ -262,7 +168,7 @@ class ContentInfoActivity : Activity() {
 
     /**
      * PUBLIC_INTERFACE
-     * Handles the "Watch now" action: calls /api/play, parses the media URL, and starts playback.
+     * Handles the "Watch now" action: calls /api/play, parses the media URL, and launches PlayerActivity.
      */
     private fun onWatchNowClicked() {
         // Provide immediate UI feedback
@@ -273,7 +179,6 @@ class ContentInfoActivity : Activity() {
         progressBar.visibility = View.VISIBLE
 
         val url = "$baseUrl/api/play"
-        Log.d(TAG, "Requesting playback URL: $url")
         val request = Request.Builder()
             .url(url)
             .get()
@@ -281,7 +186,6 @@ class ContentInfoActivity : Activity() {
 
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Playback API call failed", e)
                 runOnUiThread {
                     watchNowButton.isEnabled = true
                     progressBar.visibility = View.GONE
@@ -296,7 +200,6 @@ class ContentInfoActivity : Activity() {
             override fun onResponse(call: Call, response: Response) {
                 val bodyString = response.body?.string().orEmpty()
                 if (!response.isSuccessful || bodyString.isBlank()) {
-                    Log.e(TAG, "Playback API error: code=${response.code}, bodyEmpty=${bodyString.isBlank()}")
                     runOnUiThread {
                         watchNowButton.isEnabled = true
                         progressBar.visibility = View.GONE
@@ -308,22 +211,24 @@ class ContentInfoActivity : Activity() {
                     val obj = JSONObject(bodyString)
                     val mediaUrl = obj.optString("url", "").trim()
 
-                    if (mediaUrl.isBlank()) {
-                        Log.e(TAG, "Playback response missing 'url' field: $bodyString")
-                        runOnUiThread {
-                            watchNowButton.isEnabled = true
-                            progressBar.visibility = View.GONE
-                            Toast.makeText(this@ContentInfoActivity, "Missing playback URL.", Toast.LENGTH_LONG).show()
-                        }
-                        return
-                    }
-
-                    Log.d(TAG, "Received playback URL: $mediaUrl")
                     runOnUiThread {
-                        startPlayback(mediaUrl)
+                        watchNowButton.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        if (mediaUrl.isBlank()) {
+                            Toast.makeText(this@ContentInfoActivity, "Missing playback URL.", Toast.LENGTH_LONG).show()
+                            return@runOnUiThread
+                        }
+                        // Launch PlayerActivity
+                        val intent = PlayerActivity.newIntent(
+                            context = this@ContentInfoActivity,
+                            mediaUrl = mediaUrl,
+                            title = titleText.text?.toString(),
+                            poster = posterUrl
+                        )
+                        startActivity(intent)
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     }
-                } catch (ex: Exception) {
-                    Log.e(TAG, "Playback response parse error", ex)
+                } catch (_: Exception) {
                     runOnUiThread {
                         watchNowButton.isEnabled = true
                         progressBar.visibility = View.GONE
@@ -332,113 +237,5 @@ class ContentInfoActivity : Activity() {
                 }
             }
         })
-    }
-
-    /**
-     * PUBLIC_INTERFACE
-     * Initializes ExoPlayer if needed, sets the media item, prepares, and starts playback.
-     *
-     * @param mediaUrl The URL string to play.
-     */
-    private fun startPlayback(mediaUrl: String) {
-        try {
-            val parsed = Uri.parse(mediaUrl)
-            if (parsed.scheme.isNullOrBlank()) {
-                Log.e(TAG, "Invalid playback URL (no scheme): $mediaUrl")
-                watchNowButton.isEnabled = true
-                progressBar.visibility = View.GONE
-                Toast.makeText(this, "Invalid playback URL.", Toast.LENGTH_LONG).show()
-                return
-            }
-
-            // Lazily create player with robust error listener
-            val player = exoPlayer ?: ExoPlayer.Builder(this).build().also { created ->
-                exoPlayer = created
-                created.addListener(object : Player.Listener {
-                    override fun onPlayerError(error: PlaybackException) {
-                        Log.e(TAG, "ExoPlayer error: ${error.errorCodeName}", error)
-                        Toast.makeText(
-                            this@ContentInfoActivity,
-                            "Playback error: ${error.errorCodeName}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        progressBar.visibility = View.GONE
-                        watchNowButton.isEnabled = true
-                    }
-
-                    override fun onPlaybackStateChanged(playbackState: Int) {
-                        when (playbackState) {
-                            Player.STATE_BUFFERING -> {
-                                Log.d(TAG, "Player buffering...")
-                                progressBar.visibility = View.VISIBLE
-                            }
-                            Player.STATE_READY -> {
-                                Log.d(TAG, "Player ready.")
-                                progressBar.visibility = View.GONE
-                            }
-                            Player.STATE_ENDED -> {
-                                Log.d(TAG, "Playback ended.")
-                            }
-                            Player.STATE_IDLE -> {
-                                Log.d(TAG, "Player idle.")
-                            }
-                        }
-                    }
-                })
-            }
-
-            // Attach player to view and show player
-            if (playerView.player !== player) {
-                playerView.player = player
-            }
-            playerView.visibility = View.VISIBLE
-
-            // Ensure controller buttons are wired
-            wirePlayerControls()
-
-            // Hide poster and overlays so video is visible
-            posterImage.visibility = View.GONE
-            gradientOverlay.visibility = View.GONE
-            overlayContent.visibility = View.GONE
-
-            // Prepare media item and start playback
-            val item = MediaItem.fromUri(parsed)
-            player.setMediaItem(item, /* startPositionMs = */ 0)
-            player.prepare()
-            player.playWhenReady = true
-            player.play() // ensure playback starts immediately
-
-            // Keep UI responsive
-            watchNowButton.isEnabled = true
-            progressBar.visibility = View.GONE
-
-            // Informative toast (non-intrusive)
-            Toast.makeText(this, "Starting playback…", Toast.LENGTH_SHORT).show()
-            Log.d(TAG, "Playback started for URL: $mediaUrl")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start playback", e)
-            watchNowButton.isEnabled = true
-            progressBar.visibility = View.GONE
-            Toast.makeText(this, "Failed to start playback.", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    // PUBLIC_INTERFACE
-    override fun onStop() {
-        /** Pause playback when leaving screen; keep player to allow resume in onStart if needed. */
-        super.onStop()
-        exoPlayer?.playWhenReady = false
-        exoPlayer?.pause()
-        Log.d(TAG, "onStop: player paused")
-    }
-
-    // PUBLIC_INTERFACE
-    override fun onDestroy() {
-        /** Release player resources when Activity is destroyed. */
-        super.onDestroy()
-        exoPlayer?.release()
-        exoPlayer = null
-        playerView.player = null
-        Log.d(TAG, "onDestroy: player released")
     }
 }

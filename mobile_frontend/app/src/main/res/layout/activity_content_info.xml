@@ -12,13 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/player_header_height">
 
-        <!-- Player view for video playback (hidden until playback starts) -->
-        <com.google.android.exoplayer2.ui.StyledPlayerView
-            android:id="@+id/playerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            app:controller_layout_id="@layout/player_controls_custom" />
+        <!-- Player removed: playback now happens in a dedicated PlayerActivity -->
 
         <ImageView
             android:id="@+id/detailPosterImage"

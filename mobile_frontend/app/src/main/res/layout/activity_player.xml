@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootPlayer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/streamly_black">
+
+    <!-- Player view takes full screen and uses existing custom controller -->
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/player_controls_custom"
+        android:keepScreenOn="true"
+        android:contentDescription="@string/watch_now" />
+
+    <!-- Optional poster shown before first frame is rendered -->
+    <ImageView
+        android:id="@+id/playerPoster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/poster_placeholder"
+        android:contentDescription="@string/poster_content_desc"
+        android:visibility="gone" />
+
+    <!-- Optional overlay title for accessibility/branding (subtle) -->
+    <TextView
+        android:id="@+id/playerTitle"
+        style="@style/TextAppearance.Figtree.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:padding="12dp"
+        android:layout_gravity="top|start"
+        android:textColor="@color/streamly_on_surface"
+        android:alpha="0.75" />
+
+</FrameLayout>

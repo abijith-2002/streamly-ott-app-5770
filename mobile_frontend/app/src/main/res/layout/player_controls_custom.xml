@@ -27,40 +27,8 @@
         android:paddingEnd="@dimen/player_controls_side_padding"
         android:paddingBottom="@dimen/player_controls_bottom_padding">
 
-        <!-- Row 1: Action buttons aligned to the right (Settings then Fullscreen) -->
-        <LinearLayout
-            android:id="@+id/actionButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end|center_vertical"
-            android:layout_marginBottom="8dp">
 
-            <ImageButton
-                android:id="@+id/exo_settings"
-                android:layout_width="@dimen/action_button_size"
-                android:layout_height="@dimen/action_button_size"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/settings"
-                app:tint="@color/streamly_on_surface"
-                android:contentDescription="@string/player_settings"
-                android:layout_marginEnd="8dp" />
-
-            <ImageButton
-                android:id="@+id/exo_fullscreen"
-                android:layout_width="@dimen/action_button_size"
-                android:layout_height="@dimen/action_button_size"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/fullscreen"
-                app:tint="@color/streamly_on_surface"
-                android:contentDescription="@string/player_fullscreen"
-                android:visibility="visible"
-                android:alpha="1.0"
-                android:minWidth="@dimen/action_button_size"
-                android:minHeight="@dimen/action_button_size" />
-        </LinearLayout>
-
-        <!-- Row 2: current time | progress bar | total duration (as a single group, slightly lower) -->
+        <!-- Row 1: current time | progress bar | total duration (as a single group, slightly lower) -->
         <LinearLayout
             android:id="@+id/progressRow"
             android:layout_width="match_parent"
@@ -115,6 +83,38 @@
                 android:layout_height="wrap_content"
                 android:text="00:00"
                 android:textColor="@color/streamly_on_surface" />
+        </LinearLayout>
+        <!-- Row 2: Action buttons aligned to the right (Settings then Fullscreen) -->
+        <LinearLayout
+            android:id="@+id/actionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/exo_settings"
+                android:layout_width="@dimen/action_button_size"
+                android:layout_height="@dimen/action_button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/settings"
+                app:tint="@color/streamly_on_surface"
+                android:contentDescription="@string/player_settings"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/exo_fullscreen"
+                android:layout_width="@dimen/action_button_size"
+                android:layout_height="@dimen/action_button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/fullscreen"
+                app:tint="@color/streamly_on_surface"
+                android:contentDescription="@string/player_fullscreen"
+                android:visibility="visible"
+                android:alpha="1.0"
+                android:minWidth="@dimen/action_button_size"
+                android:minHeight="@dimen/action_button_size" />
         </LinearLayout>
 
     </LinearLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sample Declarative Gradle Android App</string>
+    <string name="app_name">Streamly</string>
 
     <!-- Top navigation labels -->
     <string name="nav_search">Search</string>

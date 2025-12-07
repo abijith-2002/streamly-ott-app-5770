@@ -4,6 +4,7 @@
     android:id="@+id/rootPlayer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
     android:background="@color/streamly_black">
 
     <!-- Player view takes full screen and uses existing custom controller -->

@@ -14,6 +14,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.WindowCompat
 import coil.load
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -67,6 +68,8 @@ class PlayerActivity : Activity() {
         super.onCreate(savedInstanceState)
         // Dark background to avoid white flashes
         window.setBackgroundDrawableResource(R.color.streamly_black)
+        // Edge-to-edge: allow content to draw behind system bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_player)
 
         // Read extras
@@ -84,6 +87,7 @@ class PlayerActivity : Activity() {
         posterView = findViewById(R.id.playerPoster)
         titleView = findViewById(R.id.playerTitle)
 
+        // Keep screen on while this activity is active
         playerView.keepScreenOn = true
         playerView.controllerShowTimeoutMs = 5000
         playerView.useController = true
@@ -159,7 +163,7 @@ class PlayerActivity : Activity() {
                                 posterView?.visibility = View.GONE
                             }
                             Player.STATE_ENDED -> {
-                                // Finish on end? For now keep activity; user can exit.
+                                // Keep activity; user can exit manually.
                             }
                         }
                     }
@@ -189,7 +193,7 @@ class PlayerActivity : Activity() {
     }
 
     private fun enterImmersiveMode() {
-        // Keep screen on at window level as well
+        // Keep screen on at window level while active
         @Suppress("DEPRECATION")
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -220,6 +224,8 @@ class PlayerActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        // Re-enable immersive edge-to-edge and keep screen on during playback
+        playerView.keepScreenOn = true
         enterImmersiveMode()
         if (Build.VERSION.SDK_INT < 24) {
             initializePlayer()
@@ -227,6 +233,17 @@ class PlayerActivity : Activity() {
     }
 
     override fun onPause() {
+        // Restore system bars and allow screen to turn off when leaving the activity
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.show(WindowInsets.Type.systemBars())
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
+        @Suppress("DEPRECATION")
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        playerView.keepScreenOn = false
+
         if (Build.VERSION.SDK_INT < 24) {
             releasePlayer()
         }

@@ -72,11 +72,6 @@ class RoundedTimeBar @JvmOverloads constructor(
         setBufferedColor(Color.TRANSPARENT)
         setUnplayedColor(Color.TRANSPARENT)
 
-        // Keep the scrubber visible via XML or fallback here
-        if (isInEditMode) {
-            // no-op
-        }
-
         // Keep our bar in sync while scrubbing (before the control view pushes setPosition updates)
         addListener(object : TimeBar.OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {
@@ -94,6 +89,20 @@ class RoundedTimeBar @JvmOverloads constructor(
                 invalidate()
             }
         })
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        // Ensure the time bar never runs its own lingering animations.
+        // The activity animates the unified controller group; the bar should not animate independently.
+        animate().cancel()
+        alpha = 1f
+    }
+
+    override fun onDetachedFromWindow() {
+        // Cancel any ongoing animations to avoid leaking animators.
+        animate().cancel()
+        super.onDetachedFromWindow()
     }
 
     // PUBLIC_INTERFACE

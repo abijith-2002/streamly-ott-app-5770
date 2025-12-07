@@ -71,7 +71,7 @@ class PlayerActivity : Activity() {
     private val showInterpolator = DecelerateInterpolator() // Material-like ease-out for showing
     private val hideInterpolator = AccelerateInterpolator() // Ease-in for hiding
     private val controllerAnimDurationMs = 220L
-    private val controllerTranslateYPx by lazy { dpToPx(16f) } // subtle slide from bottom
+    private val controllerTranslateYPx: Float = 0f // No translate; fade-only to avoid bottom row clipping
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,14 +167,8 @@ class PlayerActivity : Activity() {
 
         // Animate when the controller visibility changes
         playerView.setControllerVisibilityListener(
-            object : com.google.android.exoplayer2.ui.StyledPlayerControlView.VisibilityListener {
-                override fun onVisibilityChange(visibility: Int) {
-                    if (visibility == View.VISIBLE) {
-                        animateControllerGroup(show = true)
-                    } else {
-                        animateControllerGroup(show = false)
-                    }
-                }
+            StyledPlayerView.ControllerVisibilityListener { visibility ->
+                animateControllerGroup(show = visibility == View.VISIBLE)
             }
         )
 
@@ -187,7 +181,7 @@ class PlayerActivity : Activity() {
 
     /**
      * Animate the unified controls group using consistent easing and durations.
-     * All controller elements move/fade together to maintain a single lifecycle.
+     * Fade-only to avoid bottom-row clipping where the time bar could appear to hide earlier.
      */
     private fun animateControllerGroup(show: Boolean, immediate: Boolean = false) {
         val group = controllerGroup ?: return
@@ -197,17 +191,13 @@ class PlayerActivity : Activity() {
             group.visibility = View.VISIBLE
             if (immediate) {
                 group.alpha = 1f
-                group.translationY = 0f
                 return
             }
-            // Start from slightly translated/transparent to ease-in
             if (group.alpha < 1f) {
                 group.alpha = 0f
-                group.translationY = controllerTranslateYPx
             }
             group.animate()
                 .alpha(1f)
-                .translationY(0f)
                 .setDuration(controllerAnimDurationMs)
                 .setInterpolator(showInterpolator)
                 .withEndAction { group.visibility = View.VISIBLE }
@@ -215,13 +205,11 @@ class PlayerActivity : Activity() {
         } else {
             if (immediate) {
                 group.alpha = 0f
-                group.translationY = controllerTranslateYPx
                 group.visibility = View.GONE
                 return
             }
             group.animate()
                 .alpha(0f)
-                .translationY(controllerTranslateYPx)
                 .setDuration(controllerAnimDurationMs)
                 .setInterpolator(hideInterpolator)
                 .withEndAction { group.visibility = View.GONE }

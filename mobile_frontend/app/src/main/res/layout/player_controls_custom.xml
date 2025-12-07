@@ -16,25 +16,25 @@
         android:contentDescription="@string/watch_now"
         app:tint="@color/streamly_on_surface" />
 
-    <!-- Bottom controls area -->
-    <FrameLayout
+    <!-- Bottom controls area: stacked rows -->
+    <LinearLayout
         android:id="@+id/bottomControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:orientation="vertical"
         android:paddingStart="@dimen/player_controls_side_padding"
         android:paddingEnd="@dimen/player_controls_side_padding"
         android:paddingBottom="12dp">
 
-        <!-- Row: current time | progress bar | total duration -->
+        <!-- Row 1: current time | progress bar | total duration (centered as a group) -->
         <LinearLayout
             android:id="@+id/progressRow"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="112dp">
+            android:gravity="center_vertical">
 
             <!-- Current position -->
             <TextView
@@ -48,9 +48,8 @@
             <!-- Progress container with rounded clipping -->
             <FrameLayout
                 android:id="@+id/progressContainer"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/player_timebar_preferred_width"
                 android:layout_height="@dimen/timebar_touch_target"
-                android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_timebar_rounded"
@@ -81,14 +80,14 @@
                 android:textColor="@color/streamly_on_surface" />
         </LinearLayout>
 
-        <!-- Action buttons at bottom-right: Settings then Fullscreen -->
+        <!-- Row 2: Action buttons aligned to the right (Settings then Fullscreen) -->
         <LinearLayout
             android:id="@+id/actionButtons"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="end|center_vertical">
 
             <ImageButton
                 android:id="@+id/exo_settings"
@@ -110,6 +109,6 @@
                 android:contentDescription="@string/player_fullscreen" />
         </LinearLayout>
 
-    </FrameLayout>
+    </LinearLayout>
 
 </FrameLayout>

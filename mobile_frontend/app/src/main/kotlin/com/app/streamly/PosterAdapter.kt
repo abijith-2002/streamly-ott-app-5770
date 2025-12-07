@@ -1,4 +1,4 @@
-package org.example.app
+package com.app.streamly
 
 import android.view.LayoutInflater
 import android.view.View

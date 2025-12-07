@@ -8,11 +8,11 @@ plugins {
 android {
     // PUBLIC_INTERFACE
     // Standard Android configuration for the Streamly app.
-    namespace = "org.example.app"
+    namespace = "com.app.streamly"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.gradle.experimental.android.app"
+        applicationId = "com.app.streamly"
         minSdk = 30
         targetSdk = 34
         versionCode = 1

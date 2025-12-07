@@ -64,7 +64,7 @@
                     android:clipToOutline="true">
 
                     <!-- Progress bar (ExoPlayer TimeBar) -->
-                    <org.example.app.ui.RoundedTimeBar
+                    <com.app.streamly.ui.RoundedTimeBar
                         android:id="@+id/exo_progress"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

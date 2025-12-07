@@ -1,4 +1,4 @@
-package org.example.app.ui
+package com.app.streamly.ui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,7 +10,7 @@ import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
-import org.example.app.R
+import com.app.streamly.R
 import kotlin.math.max
 import kotlin.math.min
 

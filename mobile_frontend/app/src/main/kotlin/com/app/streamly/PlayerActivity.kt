@@ -1,4 +1,4 @@
-package org.example.app
+package com.app.streamly
 
 import android.app.Activity
 import android.content.Context

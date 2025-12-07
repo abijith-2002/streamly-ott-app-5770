@@ -17,62 +17,99 @@
         app:tint="@color/streamly_on_surface" />
 
     <!-- Bottom controls area -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:id="@+id/bottomControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="@dimen/player_controls_side_padding"
+        android:paddingEnd="@dimen/player_controls_side_padding"
         android:paddingBottom="12dp">
 
-        <!-- Progress bar -->
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
-            android:id="@+id/exo_progress"
-            android:layout_width="0dp"
-            android:layout_height="24dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Row: current time | progress bar | total duration -->
+        <LinearLayout
+            android:id="@+id/progressRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="112dp">
 
-        <!-- Current position: start-aligned to progress bar start -->
-        <TextView
-            android:id="@+id/exo_position"
-            style="@style/TextAppearance.Figtree.Label"
+            <!-- Current position -->
+            <TextView
+                android:id="@+id/exo_position"
+                style="@style/TextAppearance.Figtree.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@color/streamly_on_surface" />
+
+            <!-- Progress container with rounded clipping -->
+            <FrameLayout
+                android:id="@+id/progressContainer"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/timebar_touch_target"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_timebar_rounded"
+                android:clipToOutline="true">
+
+                <!-- Progress bar (ExoPlayer TimeBar) -->
+                <com.google.android.exoplayer2.ui.DefaultTimeBar
+                    android:id="@+id/exo_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:bar_height="@dimen/timebar_height"
+                    app:touch_target_height="@dimen/timebar_touch_target"
+                    app:played_color="@color/streamly_on_surface"
+                    app:buffered_color="#99FFFFFF"
+                    app:unplayed_color="#66FFFFFF"
+                    app:scrubber_color="@color/streamly_on_surface"
+                    app:scrubber_enabled_size="8dp"
+                    app:scrubber_dragged_size="10dp" />
+            </FrameLayout>
+
+            <!-- Total duration -->
+            <TextView
+                android:id="@+id/exo_duration"
+                style="@style/TextAppearance.Figtree.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@color/streamly_on_surface" />
+        </LinearLayout>
+
+        <!-- Action buttons at bottom-right: Settings then Fullscreen -->
+        <LinearLayout
+            android:id="@+id/actionButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
-            android:textColor="@color/streamly_on_surface"
-            android:layout_marginTop="4dp"
-            app:layout_constraintTop_toBottomOf="@id/exo_progress"
-            app:layout_constraintStart_toStartOf="@id/exo_progress" />
+            android:layout_gravity="bottom|end"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <!-- Total duration: end-aligned to progress bar end -->
-        <TextView
-            android:id="@+id/exo_duration"
-            style="@style/TextAppearance.Figtree.Label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            android:textColor="@color/streamly_on_surface"
-            android:layout_marginTop="4dp"
-            app:layout_constraintTop_toBottomOf="@id/exo_progress"
-            app:layout_constraintEnd_toEndOf="@id/exo_progress" />
+            <ImageButton
+                android:id="@+id/exo_settings"
+                android:layout_width="@dimen/action_button_size"
+                android:layout_height="@dimen/action_button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/settings"
+                app:tint="@color/streamly_on_surface"
+                android:contentDescription="@string/player_settings"
+                android:layout_marginEnd="8dp" />
 
-        <!-- Settings icon: immediately to the left of total duration -->
-        <ImageButton
-            android:id="@+id/exo_settings"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_manage"
-            app:tint="@color/streamly_on_surface"
-            android:contentDescription="@string/player_settings"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintTop_toTopOf="@id/exo_duration"
-            app:layout_constraintBottom_toBottomOf="@id/exo_duration"
-            app:layout_constraintEnd_toStartOf="@id/exo_duration" />
+            <ImageButton
+                android:id="@+id/exo_fullscreen"
+                android:layout_width="@dimen/action_button_size"
+                android:layout_height="@dimen/action_button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/fullscreen"
+                app:tint="@color/streamly_on_surface"
+                android:contentDescription="@string/player_fullscreen" />
+        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
 </FrameLayout>

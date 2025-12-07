@@ -5,9 +5,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import coil.load
@@ -66,6 +71,12 @@ class ContentInfoActivity : Activity() {
     // Player view for rendering video
     private lateinit var playerView: StyledPlayerView
 
+    // Container and scroll for fullscreen toggle management
+    private lateinit var headerContainer: FrameLayout
+    private lateinit var extraContentScroll: ScrollView
+    private var defaultHeaderHeightPx: Int = 0
+    private var isFullscreen: Boolean = false
+
     // ExoPlayer instance (created on demand)
     private var exoPlayer: ExoPlayer? = null
 
@@ -85,11 +96,17 @@ class ContentInfoActivity : Activity() {
         gradientOverlay = findViewById(R.id.gradientOverlay)
         overlayContent = findViewById(R.id.overlayContent)
         playerView = findViewById(R.id.playerView)
+        headerContainer = findViewById(R.id.headerContainer)
+        extraContentScroll = findViewById(R.id.extraContentScroll)
+        defaultHeaderHeightPx = resources.getDimensionPixelSize(R.dimen.player_header_height)
 
         // Configure player view (hidden initially)
         playerView.visibility = View.GONE
         playerView.keepScreenOn = true
         playerView.useController = true
+
+        // Wire player controller buttons (settings / fullscreen)
+        wirePlayerControls()
 
         val id = intent.getStringExtra(EXTRA_ID).orEmpty()
         val name = intent.getStringExtra(EXTRA_NAME).orEmpty()
@@ -114,6 +131,72 @@ class ContentInfoActivity : Activity() {
         if (id.isNotBlank()) {
             fetchInfo(id)
         }
+    }
+
+    /**
+     * PUBLIC_INTERFACE
+     * Wires the controller's settings and fullscreen buttons.
+     */
+    private fun wirePlayerControls() {
+        // Try immediate lookup
+        attachControllerListenersIfPresent()
+        // Also post a second attempt in case controller inflates later
+        playerView.post {
+            attachControllerListenersIfPresent()
+        }
+    }
+
+    private fun attachControllerListenersIfPresent() {
+        val fullscreenButton = playerView.findViewById<ImageButton?>(R.id.exo_fullscreen)
+        val settingsButton = playerView.findViewById<ImageButton?>(R.id.exo_settings)
+        fullscreenButton?.setOnClickListener { toggleFullscreen() }
+        settingsButton?.setOnClickListener { onSettingsClicked() }
+    }
+
+    /**
+     * PUBLIC_INTERFACE
+     * Toggles fullscreen playback by hiding system UI and resizing the player container.
+     *
+     * Behavior:
+     * - Enter: hide status/navigation bars, expand headerContainer to match_parent, hide extra content.
+     * - Exit: show system bars, restore header height from dimens, show extra content.
+     */
+    private fun toggleFullscreen() {
+        isFullscreen = !isFullscreen
+        if (isFullscreen) {
+            // Hide system UI for immersive fullscreen
+            window.insetsController?.let { controller ->
+                controller.hide(WindowInsets.Type.systemBars())
+                controller.systemBarsBehavior =
+                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+
+            // Expand player to full height and hide scroll content
+            headerContainer.layoutParams = headerContainer.layoutParams.apply {
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            headerContainer.requestLayout()
+            extraContentScroll.visibility = View.GONE
+        } else {
+            // Show system UI
+            window.insetsController?.show(WindowInsets.Type.systemBars())
+
+            // Restore player height and show scroll content
+            headerContainer.layoutParams = headerContainer.layoutParams.apply {
+                height = defaultHeaderHeightPx
+            }
+            headerContainer.requestLayout()
+            extraContentScroll.visibility = View.VISIBLE
+        }
+    }
+
+    /**
+     * PUBLIC_INTERFACE
+     * Stub settings handler; replace with real settings screen or dialog when available.
+     */
+    private fun onSettingsClicked() {
+        Toast.makeText(this, getString(R.string.player_settings), Toast.LENGTH_SHORT).show()
+        Log.d(TAG, "Settings clicked (stub).")
     }
 
     /**
@@ -307,6 +390,9 @@ class ContentInfoActivity : Activity() {
                 playerView.player = player
             }
             playerView.visibility = View.VISIBLE
+
+            // Ensure controller buttons are wired
+            wirePlayerControls()
 
             // Hide poster and overlays so video is visible
             posterImage.visibility = View.GONE

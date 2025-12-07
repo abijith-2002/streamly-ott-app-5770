@@ -29,4 +29,5 @@
 
     <!-- Player accessibility -->
     <string name="player_settings">Playback settings</string>
+    <string name="player_fullscreen">Fullscreen</string>
 </resources>

@@ -171,9 +171,6 @@ class ContentInfoActivity : Activity() {
      * Handles the "Watch now" action: calls /api/play, parses the media URL, and launches PlayerActivity.
      */
     private fun onWatchNowClicked() {
-        // Provide immediate UI feedback
-        Toast.makeText(this, getString(R.string.watch_now), Toast.LENGTH_SHORT).show()
-
         // Disable the button briefly and show progress
         watchNowButton.isEnabled = false
         progressBar.visibility = View.VISIBLE

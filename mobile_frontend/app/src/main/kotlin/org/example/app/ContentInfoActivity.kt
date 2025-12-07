@@ -104,6 +104,8 @@ class ContentInfoActivity : Activity() {
         playerView.visibility = View.GONE
         playerView.keepScreenOn = true
         playerView.useController = true
+        // Keep controls visible longer so actions (e.g., fullscreen) are reliably tappable
+        playerView.controllerShowTimeoutMs = 5000
 
         // Wire player controller buttons (settings / fullscreen)
         wirePlayerControls()

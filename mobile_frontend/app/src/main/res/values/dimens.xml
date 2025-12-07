@@ -22,5 +22,14 @@
     <dimen name="timebar_touch_target">32dp</dimen>
     <dimen name="action_button_size">48dp</dimen>
     <dimen name="player_controls_side_padding">16dp</dimen>
-    <dimen name="player_timebar_preferred_width">240dp</dimen>
+
+    <!-- Increased preferred/min width for a wider progress area -->
+    <dimen name="player_timebar_preferred_width">280dp</dimen>
+    <dimen name="player_timebar_min_width">280dp</dimen>
+
+    <!-- Slightly more comfortable bottom padding for controller in all modes -->
+    <dimen name="player_controls_bottom_padding">20dp</dimen>
+
+    <!-- Consistent side margin for timebar group -->
+    <dimen name="player_timebar_side_margin">12dp</dimen>
 </resources>
